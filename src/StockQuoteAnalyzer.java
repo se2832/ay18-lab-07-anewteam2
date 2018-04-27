@@ -241,7 +241,7 @@ public class StockQuoteAnalyzer {
 		if (previousQuote == null) {
 			throw new InvalidAnalysisState("A second update has not yet occurred.");
 		}
-
+		//Below is the fix for Issue #5. This changes the subtracted value from the previousQuote.change() to previousQuote.getLastTrade()
 		return currentQuote.getLastTrade() - previousQuote.getLastTrade();
 	}
 
