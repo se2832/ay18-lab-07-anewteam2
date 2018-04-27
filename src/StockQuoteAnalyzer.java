@@ -242,7 +242,7 @@ public class StockQuoteAnalyzer {
 			throw new InvalidAnalysisState("A second update has not yet occurred.");
 		}
 
-		return currentQuote.getLastTrade() - previousQuote.getChange();
+		return currentQuote.getLastTrade() - previousQuote.getLastTrade();
 	}
 
 	/**
