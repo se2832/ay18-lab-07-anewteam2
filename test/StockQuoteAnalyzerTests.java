@@ -140,8 +140,7 @@ public class StockQuoteAnalyzerTests {
 
 		// Act
 		analyzer.playAppropriateAudio();
-
-
+		
 		// Assert - verify that method was never called on a mock
 		verify(mockedStockTickerAudio, times(1)).playErrorMusic();
 		verify(mockedStockTickerAudio, times(0)).playHappyMusic();
