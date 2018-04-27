@@ -113,10 +113,10 @@ public class StockQuoteAnalyzer {
 		// Get a new quote.
 		try {
 			StockQuoteInterface temp = this.stockQuoteSource.getCurrentQuote();
-
 			this.previousQuote = currentQuote;
-			this.currentQuote = this.previousQuote;
-		} catch (Exception e) {
+			//Below is a fix for issue #4, the current quote and the previous quote were just being set to each other indefinitely.
+			this.currentQuote = temp;
+        } catch (Exception e) {
 			throw new StockTickerConnectionError("Unable to connect with Stock Ticker Source.");
 		}
 
@@ -235,7 +235,7 @@ public class StockQuoteAnalyzer {
 	 *             data source.
 	 */
 	public double getChangeSinceLastCheck() throws InvalidAnalysisState {
-		if (currentQuote == null) {
+        if (currentQuote == null) {
 			throw new InvalidAnalysisState("No quote has ever been retrieved.");
 		}
 		if (previousQuote == null) {
