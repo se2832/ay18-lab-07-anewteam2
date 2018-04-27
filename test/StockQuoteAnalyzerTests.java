@@ -147,8 +147,8 @@ public class StockQuoteAnalyzerTests {
 		verify(mockedStockTickerAudio, times(0)).playHappyMusic();
 		verify(mockedStockTickerAudio, times(0)).playSadMusic();
 	}
-
-    @Test
+    //Below is a fix for issue #6
+    @Test(expectedExceptions = InvalidAnalysisState.class)
 	public void testShouldGetChangeSinceLastCheckOneUpdate() throws Exception
 	{
 		// Arrange - Setup the expected calls.
@@ -157,9 +157,9 @@ public class StockQuoteAnalyzerTests {
 
         // Act
 		analyzer.refresh();
-
 		// Assert
-		Assert.assertEquals(0.0, analyzer.getChangeSinceLastCheck());
+        //Below is a fix for issue #6
+		analyzer.getChangeSinceLastCheck();
 	}
 
 	@DataProvider
@@ -226,11 +226,9 @@ public class StockQuoteAnalyzerTests {
 	    // Arrange
 		when(mockedStockQuoteGenerator.getCurrentQuote()).thenReturn(firstReturn, secondReturn);
 		analyzer = new StockQuoteAnalyzer("F", mockedStockQuoteGenerator, mockedStockTickerAudio);
-
         // Act
 		analyzer.refresh();
 		analyzer.refresh();
-
 		// Assert - Now check that the change calculation was correct.
 		Assert.assertEquals(analyzer.getChangeSinceLastCheck(), secondReturn.getLastTrade()-firstReturn.getLastTrade(), 0.01);
 	}
