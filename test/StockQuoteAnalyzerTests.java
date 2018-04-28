@@ -84,13 +84,33 @@ public class StockQuoteAnalyzerTests {
     }
 
     @Test(expectedExceptions = InvalidAnalysisState.class)
-    public void testShouldThrowExceptionWhenGetChangeSinceOpenInvalidAnalysisState() throws InvalidAnalysisState, NullPointerException, InvalidStockSymbolException, StockTickerConnectionError {
+    public void testShouldThrowExceptionWhenGetChangeSinceOpenInvalidAnalysisState() throws Exception {
         //Arrange
         analyzer = new StockQuoteAnalyzer("F", mockedStockQuoteGenerator, mockedStockTickerAudio);
 
         //Act
         analyzer.getChangeSinceOpen();
 
+        //Assert
+    }
+
+    @Test(expectedExceptions = InvalidAnalysisState.class)
+    public void getChangeSinceLastCheckShouldThrowExceptionFirstBasisPath() throws InvalidAnalysisState, NullPointerException, InvalidStockSymbolException, StockTickerConnectionError {
+        //Arrange
+        analyzer = new StockQuoteAnalyzer("F", mockedStockQuoteGenerator, mockedStockTickerAudio);
+        //Act
+        analyzer.getChangeSinceLastCheck();
+        //Assert
+    }
+
+    @Test(expectedExceptions = InvalidAnalysisState.class)
+    public void getChangeSinceLastCheckShouldThrowExceptionSecondBasisPath() throws Exception {
+        //Arrange
+        when(mockedStockQuoteGenerator.getCurrentQuote()).thenReturn(new StockQuote("F", 100.00, 100.00, 0.00));
+        analyzer = new StockQuoteAnalyzer("F", mockedStockQuoteGenerator, mockedStockTickerAudio);
+        //Act
+        analyzer.refresh();
+        analyzer.getChangeSinceLastCheck();
         //Assert
     }
 
@@ -135,7 +155,6 @@ public class StockQuoteAnalyzerTests {
     @Test(expectedExceptions = InvalidAnalysisState.class)
     public void testShouldGetChangeSinceLastCheckOneUpdate() throws Exception {
         // Arrange - Setup the expected calls.
-        when(mockedStockQuoteGenerator.getCurrentQuote()).thenReturn(new StockQuote("F", 100.00, 100.00, 0.00));
         analyzer = new StockQuoteAnalyzer("F", mockedStockQuoteGenerator, mockedStockTickerAudio);
 
         // Act
@@ -172,6 +191,7 @@ public class StockQuoteAnalyzerTests {
         };
     }
 
+
     @Test(dataProvider = "normalOperationDataProvider")
     public void testGetPercentChangeSinceLastOpenShouldReturnCorrectPercentChangedWhenCalled(StockQuote firstReturn, StockQuote secondReturn, int happyMusicCount, int sadMusicCount,
                                                                                              double percentChange) throws Exception {
@@ -203,7 +223,7 @@ public class StockQuoteAnalyzerTests {
 
 
     @Test(dataProvider = "normalOperationDataProvider")
-    public void testGetChangeSinceLastCheckShouldReturnCorrectChangeWhenCalled(StockQuote firstReturn, StockQuote secondReturn, int happyMusicCount, int sadMusicCount,
+    public void testGetChangeSinceLastCheckShouldReturnCorrectChangeWhenCalledThirdBasisPath(StockQuote firstReturn, StockQuote secondReturn, int happyMusicCount, int sadMusicCount,
                                                                                double percentChange) throws Exception {
 
         // Arrange
@@ -215,7 +235,7 @@ public class StockQuoteAnalyzerTests {
         // Assert - Now check that the change calculation was correct.
         Assert.assertEquals(analyzer.getChangeSinceLastCheck(), secondReturn.getLastTrade() - firstReturn.getLastTrade(), 0.01);
     }
-
+    
     @Test(dataProvider = "normalOperationDataProvider")
     public void testGetChangeSinceOpenShouldReturnCorrectChangeWhenCalled(StockQuote firstReturn, StockQuote secondReturn, int happyMusicCount, int sadMusicCount,
                                                                           double percentChange) throws Exception {
