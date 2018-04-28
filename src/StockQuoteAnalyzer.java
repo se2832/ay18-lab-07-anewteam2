@@ -134,11 +134,11 @@ public class StockQuoteAnalyzer {
 	public void playAppropriateAudio() {
 		if (audioPlayer != null) {
 			try {
-				//Fix for Issue 7: Happy AUdio plays when change is greater than 1.00, rather than != 1.00
+				//Fix for Issue #7: Happy Audio plays when change is greater than 1.00, rather than != 1.00
 				if ((this.getPercentChangeSinceOpen() > 1) || (this.getChangeSinceLastCheck()>1.00)) {
 					audioPlayer.playHappyMusic();
 				}
-				//Fix for Issue 9: Sad audio now plays when percent change is less than -1%, rather than 0%
+				//Fix for Issue #9: Sad audio now plays when percent change is less than -1%, rather than 0%
 				if ((this.getPercentChangeSinceOpen() < -1) && (this.getChangeSinceLastCheck()<1.00)) {
 					audioPlayer.playSadMusic();
 				}
