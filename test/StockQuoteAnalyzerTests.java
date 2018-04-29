@@ -95,6 +95,26 @@ public class StockQuoteAnalyzerTests {
     }
 
     @Test(expectedExceptions = InvalidAnalysisState.class)
+    public void getPercentChangeSinceOpenBasisPathOne() throws Exception {
+        //Arrange
+        analyzer = new StockQuoteAnalyzer("F", mockedStockQuoteGenerator, mockedStockTickerAudio);
+        //Act
+        analyzer.getPercentChangeSinceOpen();
+        //Assert
+    }
+    @Test
+    public void getPercentChangeSinceOpenBasisPathTwo() throws Exception {
+        //Arrange
+        when(mockedStockQuoteGenerator.getCurrentQuote()).thenReturn(new StockQuote("F", 100.00, 100.00, 0.00));
+        analyzer = new StockQuoteAnalyzer("F", mockedStockQuoteGenerator, mockedStockTickerAudio);
+        //Act
+        analyzer.refresh();
+        //Assert
+        Assert.assertEquals(analyzer.getPercentChangeSinceOpen(), 0.0);
+    }
+
+
+    @Test(expectedExceptions = InvalidAnalysisState.class)
     public void getChangeSinceLastCheckShouldThrowExceptionFirstBasisPath() throws InvalidAnalysisState, NullPointerException, InvalidStockSymbolException, StockTickerConnectionError {
         //Arrange
         analyzer = new StockQuoteAnalyzer("F", mockedStockQuoteGenerator, mockedStockTickerAudio);
@@ -224,7 +244,7 @@ public class StockQuoteAnalyzerTests {
 
     @Test(dataProvider = "normalOperationDataProvider")
     public void testGetChangeSinceLastCheckShouldReturnCorrectChangeWhenCalledThirdBasisPath(StockQuote firstReturn, StockQuote secondReturn, int happyMusicCount, int sadMusicCount,
-                                                                               double percentChange) throws Exception {
+                                                                                             double percentChange) throws Exception {
 
         // Arrange
         when(mockedStockQuoteGenerator.getCurrentQuote()).thenReturn(firstReturn, secondReturn);
@@ -235,7 +255,7 @@ public class StockQuoteAnalyzerTests {
         // Assert - Now check that the change calculation was correct.
         Assert.assertEquals(analyzer.getChangeSinceLastCheck(), secondReturn.getLastTrade() - firstReturn.getLastTrade(), 0.01);
     }
-    
+
     @Test(dataProvider = "normalOperationDataProvider")
     public void testGetChangeSinceOpenShouldReturnCorrectChangeWhenCalled(StockQuote firstReturn, StockQuote secondReturn, int happyMusicCount, int sadMusicCount,
                                                                           double percentChange) throws Exception {
