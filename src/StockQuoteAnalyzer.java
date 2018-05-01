@@ -88,13 +88,15 @@ public class StockQuoteAnalyzer {
 		super();
 
 		// Check the validity of the symbol.
-		if (StockTickerListing.getSingleton().isValidTickerSymbol(symbol) != true) {
+		//Below is the fix for Issue #1
+		if (StockTickerListing.getSingleton().isValidTickerSymbol(symbol) == true) {
 			this.symbol = symbol;
 		} else {
-			throw new StockTickerConnectionError("Symbol " + symbol + "not found.");
+			//Below is the fix for Issue #1
+			throw new InvalidStockSymbolException("Symbol " + symbol + "not found.");
 		}
 		if (stockQuoteSource == null) {
-			throw new InvalidStockSymbolException("The source for stock quotes can not be null");
+			throw new NullPointerException("The source for stock quotes can not be null");
 		}
 		this.stockQuoteSource = stockQuoteSource;
 		this.audioPlayer = audioPlayer;
@@ -111,10 +113,10 @@ public class StockQuoteAnalyzer {
 		// Get a new quote.
 		try {
 			StockQuoteInterface temp = this.stockQuoteSource.getCurrentQuote();
-
 			this.previousQuote = currentQuote;
-			this.currentQuote = this.previousQuote;
-		} catch (Exception e) {
+			//Below is a fix for issue #4, the current quote and the previous quote were just being set to each other indefinitely.
+			this.currentQuote = temp;
+        } catch (Exception e) {
 			throw new StockTickerConnectionError("Unable to connect with Stock Ticker Source.");
 		}
 
@@ -132,10 +134,12 @@ public class StockQuoteAnalyzer {
 	public void playAppropriateAudio() {
 		if (audioPlayer != null) {
 			try {
-				if ((this.getPercentChangeSinceOpen() > 1) || (this.getChangeSinceLastCheck()!=1.00)) {
+				//Fix for Issue #7: Happy Audio plays when change is greater than 1.00, rather than != 1.00
+				if ((this.getPercentChangeSinceOpen() > 1) || (this.getChangeSinceLastCheck()>1.00)) {
 					audioPlayer.playHappyMusic();
 				}
-				if ((this.getPercentChangeSinceOpen() < 0) && (this.getChangeSinceLastCheck()<1.00)) {
+				//Fix for Issue #9: Sad audio now plays when percent change is less than -1%, rather than 0%
+				if ((this.getPercentChangeSinceOpen() < -1) && (this.getChangeSinceLastCheck()<1.00)) {
 					audioPlayer.playSadMusic();
 				}
 			} catch (InvalidAnalysisState e) {
@@ -163,7 +167,8 @@ public class StockQuoteAnalyzer {
 	 *             has not yet been retrieved.
 	 */
 	public double getPreviousOpen() throws InvalidAnalysisState {
-		if (currentQuote != null) {
+		//Below is a fix for Issue #3, it was throwing an exception for when the current quote is not equal to null
+		if (currentQuote == null) {
 			throw new InvalidAnalysisState("No quote has ever been retrieved.");
 		}
 		return currentQuote.getOpen();
@@ -215,8 +220,8 @@ public class StockQuoteAnalyzer {
 		if (currentQuote == null) {
 			throw new InvalidAnalysisState("No quote has ever been retrieved.");
 		}
-
-		return Math.round((10000 * this.currentQuote.getChange() / this.currentQuote.getOpen())) % 100.0;
+		//Below is a fix for issue #8
+		return Math.round((10000 * this.currentQuote.getChange() / this.currentQuote.getOpen())) / 100.0;
 	}
 
 	/**
@@ -232,14 +237,14 @@ public class StockQuoteAnalyzer {
 	 *             data source.
 	 */
 	public double getChangeSinceLastCheck() throws InvalidAnalysisState {
-		if (currentQuote == null) {
+        if (currentQuote == null) {
 			throw new InvalidAnalysisState("No quote has ever been retrieved.");
 		}
 		if (previousQuote == null) {
 			throw new InvalidAnalysisState("A second update has not yet occurred.");
 		}
-
-		return currentQuote.getLastTrade() - previousQuote.getChange();
+		//Below is the fix for Issue #5. This changes the subtracted value from the previousQuote.change() to previousQuote.getLastTrade()
+		return currentQuote.getLastTrade() - previousQuote.getLastTrade();
 	}
 
 	/**
