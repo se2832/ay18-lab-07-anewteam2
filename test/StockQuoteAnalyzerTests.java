@@ -95,6 +95,50 @@ public class StockQuoteAnalyzerTests {
     }
 
     @Test(expectedExceptions = InvalidAnalysisState.class)
+	public void getPreviousOpenBasisPathOne() throws Exception {
+    	//Arrange
+		analyzer = new StockQuoteAnalyzer("F", mockedStockQuoteGenerator, mockedStockTickerAudio);
+
+		//Act
+		analyzer.getPreviousOpen();
+
+	}
+
+	@Test
+	public void getCurrentPriceBasisPathTwo() throws Exception {
+    	//Arrange
+		when(mockedStockQuoteGenerator.getCurrentQuote()).thenReturn(new StockQuote("F", 100.00, 100.00, 0.00));
+		analyzer = new StockQuoteAnalyzer("F", mockedStockQuoteGenerator, mockedStockTickerAudio);
+
+		//Act
+		analyzer.refresh();
+
+		Assert.assertEquals(analyzer.getCurrentPrice(), 100.0);
+	}
+
+	@Test(expectedExceptions = InvalidAnalysisState.class)
+	public void getCurrentPriceBasisPathOne() throws Exception {
+		//Arrange
+		analyzer = new StockQuoteAnalyzer("F", mockedStockQuoteGenerator, mockedStockTickerAudio);
+
+		//Act
+		analyzer.getCurrentPrice();
+
+	}
+
+	@Test
+	public void getPreviousOpenBasisPathTwo() throws Exception {
+    	//Arrange
+		when(mockedStockQuoteGenerator.getCurrentQuote()).thenReturn(new StockQuote("F", 100.00, 100.00, 0.00));
+		analyzer = new StockQuoteAnalyzer("F", mockedStockQuoteGenerator, mockedStockTickerAudio);
+
+		//Act
+		analyzer.refresh();
+
+		Assert.assertEquals(analyzer.getPreviousOpen(), 100.0);
+	}
+
+    @Test(expectedExceptions = InvalidAnalysisState.class)
     public void getPercentChangeSinceOpenBasisPathOne() throws Exception {
         //Arrange
         analyzer = new StockQuoteAnalyzer("F", mockedStockQuoteGenerator, mockedStockTickerAudio);
